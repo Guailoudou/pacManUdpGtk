@@ -18,6 +18,8 @@ static GtkWidget *window = NULL;
 static GtkCssProvider *css_provider = NULL; // 用于管理动态样式
 static guint timer_id = 0;
 
+static guint move_timer_id = 0;
+static gchar current_direction = 0;
 // 回调函数：创建房间
 static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在创建房间...\n");
@@ -46,7 +48,7 @@ static void on_move_clicked(GtkButton *button, gpointer user_data) {
     if(strcmp(direction,"下")==0)down();
     if(strcmp(direction,"左")==0)left();
     if(strcmp(direction,"右")==0)right();
-    g_print("移动方向: %s\n", direction);
+    // g_print("移动方向: %s\n", direction);
 }
 
 /// --- 核心绘图函数 ---
@@ -160,33 +162,65 @@ static void init_game_grid() {
     if (gdk_win) gdk_window_thaw_updates(gdk_win);
     g_print("格子生成完毕。\n");
 }
-
+gboolean move_timeout_callback(gpointer data) {
+    switch (current_direction) {
+        case 'w': g_signal_emit_by_name(up_button, "clicked"); break;
+        case 's': g_signal_emit_by_name(down_button, "clicked"); break;
+        case 'a': g_signal_emit_by_name(left_button, "clicked"); break;
+        case 'd': g_signal_emit_by_name(right_button, "clicked"); break;
+    }
+    return G_SOURCE_CONTINUE; // 继续运行定时器
+}
 gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
-    g_print("触发了。\n");
     // 检查是否按下了 F5
-    if (event->keyval == GDK_KEY_W || event->keyval == GDK_KEY_w) {
-        // 模拟点击按钮
+    if (move_timer_id != 0) return TRUE;
+
+    if (event->keyval == GDK_KEY_w || event->keyval == GDK_KEY_W) {
+        current_direction = 'w';
+        // 立即触发一次，然后启动定时器
         g_signal_emit_by_name(up_button, "clicked");
-        return TRUE; // 表示事件已处理，不再传递
+        move_timer_id = g_timeout_add(100, move_timeout_callback, NULL); // 80ms 一次
+        return TRUE;
     }
-    
-    // 检查是否按下了 Escape (通常用于关闭或取消)
-    if (event->keyval == GDK_KEY_S || event->keyval == GDK_KEY_s) {
+    if (event->keyval == GDK_KEY_s || event->keyval == GDK_KEY_S) {
+        current_direction = 's';
         g_signal_emit_by_name(down_button, "clicked");
+        move_timer_id = g_timeout_add(100, move_timeout_callback, NULL);
         return TRUE;
     }
-
-    if (event->keyval == GDK_KEY_A || event->keyval == GDK_KEY_a) {
+    if (event->keyval == GDK_KEY_a || event->keyval == GDK_KEY_A) {
+        current_direction = 'a';
         g_signal_emit_by_name(left_button, "clicked");
+        move_timer_id = g_timeout_add(100, move_timeout_callback, NULL);
         return TRUE;
     }
-
-    if (event->keyval == GDK_KEY_D || event->keyval == GDK_KEY_d) {
+    if (event->keyval == GDK_KEY_d || event->keyval == GDK_KEY_D) {
+        current_direction = 'd';
         g_signal_emit_by_name(right_button, "clicked");
+        move_timer_id = g_timeout_add(100, move_timeout_callback, NULL);
         return TRUE;
     }
 
     return FALSE; 
+}
+
+gboolean on_key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
+    
+    // ... 对 s, a, d 做同样处理 ...
+    // 为了简化，这里演示如果释放任意方向键都停止（视需求而定）
+    if (event->keyval == GDK_KEY_w || event->keyval == GDK_KEY_W ||
+        event->keyval == GDK_KEY_s || event->keyval == GDK_KEY_S ||
+        event->keyval == GDK_KEY_a || event->keyval == GDK_KEY_A ||
+        event->keyval == GDK_KEY_d || event->keyval == GDK_KEY_D) {
+        current_direction = 0;
+        if (move_timer_id > 0) {
+            g_source_remove(move_timer_id);
+            move_timer_id = 0;
+        }
+        return TRUE;
+    }
+    
+    return FALSE;
 }
 // // 定时器回调
 // static gboolean update_game_info(gpointer data) {
@@ -246,6 +280,7 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
             timer_id = g_timeout_add(100, tack_callback, NULL);
         }
         g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
+        g_signal_connect(window, "key-release-event", G_CALLBACK(on_key_release), NULL);
         // 确保窗口能接收按键事件
         gtk_widget_grab_focus(window); 
     }

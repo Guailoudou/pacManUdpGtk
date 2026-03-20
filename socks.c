@@ -1,8 +1,8 @@
 /*
  * @Date: 2026-03-12 10:05:56
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-19 18:37:55
- * @FilePath: /loudou/file/2JIEDUAN/socks.c
+ * @LastEditTime: 2026-03-20 12:41:40
+ * @FilePath: /2JIEDUAN/socks.c
  */
 #include "head.h"
 
@@ -39,6 +39,18 @@ int setaddr(int argc, char *argv[]){
     }
     
 }
+void send(char *data,int len)
+{
+    socklen_t addr_len = sizeof(addr);
+    sendto(udp_sock, data, len, 0, (struct sockaddr *)&addr, addr_len);
+}
+void recv(char buf[],len)
+{
+    socklen_t addr_len = sizeof(addr);
+    memset(buf,0,sizeof(buf));
+    int recv_num = recvfrom(udp_sock, buf, len, 0, (struct sockaddr *)&addr, &addr_len);
+
+}
 void sendinfo()
 {
     while (isrun)
@@ -47,8 +59,7 @@ void sendinfo()
         memset(buf,0,sizeof(buf));
         sprintf(buf,"%d-%d-%d-%d-%d-%d",himinfo.x,himinfo.y,
             ghostinfo.x,ghostinfo.y,himinfo.sc,gametime);
-        socklen_t addr_len = sizeof(addr);
-        sendto(udp_sock, buf, strlen(buf), 0, (struct sockaddr *)&addr, addr_len);
+        send(buf,strlen(buf));
     }
 }
 void getinfo()
@@ -58,6 +69,7 @@ void getinfo()
         char buf[1024];
         memset(buf,0,sizeof(buf));
         int tempx,tempy,tempc,tempgametime;
+        recv(buf, sizeof(buf));
         socklen_t addr_len = sizeof(addr);
         int recv_num = recvfrom(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addr_len);
         if(ishuman){
