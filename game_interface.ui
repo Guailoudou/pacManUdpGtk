@@ -354,6 +354,7 @@
   <object class="GtkAdjustment" id="adjustment_port">
     <property name="lower">1</property>
     <property name="upper">65535</property>
+    <property name="value">25566</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>

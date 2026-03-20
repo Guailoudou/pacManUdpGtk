@@ -5,13 +5,26 @@ static GtkWidget *stack = NULL;
 static GtkWidget *game_grid = NULL;
 static GtkWidget *label_score = NULL;
 static GtkWidget *label_time = NULL;
+
+static GtkWidget *spin_button = NULL;
+static GtkWidget *entry_join_ip = NULL;
+static GtkWidget *entry_join_port = NULL;
+
+static GtkWidget *up_button = NULL;
+static GtkWidget *down_button = NULL;
+static GtkWidget *left_button = NULL;
+static GtkWidget *right_button = NULL;
+static GtkWidget *window = NULL;
 static GtkCssProvider *css_provider = NULL; // 用于管理动态样式
 static guint timer_id = 0;
 
 // 回调函数：创建房间
 static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在创建房间...\n");
+    isServer = true;
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    gint port_value_int = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin_button));
+    g_print("端口号: %d\n", port_value_int);
     // sleep(2);//后面替换为等待连接阻塞
     //gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
 }
@@ -19,7 +32,11 @@ static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
 // 回调函数：加入房间
 static void on_join_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在加入房间...\n");
-    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    isServer = false;
+    gint port_value_int = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(entry_join_port));
+    const gchar *ip_value = gtk_entry_get_text(GTK_ENTRY(entry_join_ip));
+    g_print("连接目标: %s:%d\n", ip_value,port_value_int);
 }
 
 // 回调函数：方向控制
@@ -144,6 +161,33 @@ static void init_game_grid() {
     g_print("格子生成完毕。\n");
 }
 
+gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
+    g_print("触发了。\n");
+    // 检查是否按下了 F5
+    if (event->keyval == GDK_KEY_W || event->keyval == GDK_KEY_w) {
+        // 模拟点击按钮
+        g_signal_emit_by_name(up_button, "clicked");
+        return TRUE; // 表示事件已处理，不再传递
+    }
+    
+    // 检查是否按下了 Escape (通常用于关闭或取消)
+    if (event->keyval == GDK_KEY_S || event->keyval == GDK_KEY_s) {
+        g_signal_emit_by_name(down_button, "clicked");
+        return TRUE;
+    }
+
+    if (event->keyval == GDK_KEY_A || event->keyval == GDK_KEY_a) {
+        g_signal_emit_by_name(left_button, "clicked");
+        return TRUE;
+    }
+
+    if (event->keyval == GDK_KEY_D || event->keyval == GDK_KEY_d) {
+        g_signal_emit_by_name(right_button, "clicked");
+        return TRUE;
+    }
+
+    return FALSE; 
+}
 // // 定时器回调
 // static gboolean update_game_info(gpointer data) {
 //     time_seconds++;
@@ -186,6 +230,12 @@ static gboolean tack_callback(gpointer data) {
 // 页面切换监听
 static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gpointer user_data) {
     const gchar *name = gtk_stack_get_visible_child_name(stack);
+    if (g_strcmp0(name, "page_waiting") == 0){
+        //sock
+
+
+        gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+    }
     if (g_strcmp0(name, "page_game") == 0) {
         if (gtk_container_get_children(GTK_CONTAINER(game_grid)) == NULL) {
             init_game_grid();
@@ -195,6 +245,9 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
         if (timer_id == 0) {
             timer_id = g_timeout_add(100, tack_callback, NULL);
         }
+        g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
+        // 确保窗口能接收按键事件
+        gtk_widget_grab_focus(window); 
     }
 }
 
@@ -217,6 +270,16 @@ int cdrui_init(int argc, char *argv[]) {
     label_score = GTK_WIDGET(gtk_builder_get_object(builder, "label_score"));
     label_time = GTK_WIDGET(gtk_builder_get_object(builder, "label_time"));
 
+    spin_button = GTK_WIDGET(gtk_builder_get_object(builder, "spin_create_port"));
+    entry_join_ip = GTK_WIDGET(gtk_builder_get_object(builder, "entry_join_ip"));
+    entry_join_port = GTK_WIDGET(gtk_builder_get_object(builder, "spin_join_port"));
+    
+    up_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_up"));
+    down_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_down"));
+    left_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_left"));
+    right_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_right"));
+
+
     GtkWidget *btn_create = GTK_WIDGET(gtk_builder_get_object(builder, "btn_create_room"));
     GtkWidget *btn_join = GTK_WIDGET(gtk_builder_get_object(builder, "btn_join_room"));
 
@@ -230,7 +293,7 @@ int cdrui_init(int argc, char *argv[]) {
 
     g_signal_connect(stack, "notify::visible-child-name", G_CALLBACK(on_stack_notify_visible_child), NULL);
 
-    GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
+    window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
     gtk_widget_show_all(window);
 
     gtk_main();
