@@ -6,7 +6,7 @@
   <!-- 对象树根节点：主窗口 -->
   <object class="GtkWindow" id="main_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">多彩格子游戏</property>
+    <property name="title" translatable="yes">超级吃豆人追逐战</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <child>
@@ -153,7 +153,33 @@
             <property name="name">page_lobby</property>
           </packing>
         </child>
-        
+        <!-- 等待界面 -->
+        <child>
+         
+          <object class="GtkBox" id="waiting_bok">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="spacing">10</property>
+            <!-- 等待 -->
+            <child>
+              <object class="GtkLabel" id="label_waiting">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">等待连接ing...</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="scale" value="1.2"/>
+                </attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="name">page_waiting</property>
+          </packing>
+        </child>
         <!-- 页面 2: 游戏界面 (100x100 格子) -->
         <child>
           <object class="GtkBox" id="game_box">

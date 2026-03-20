@@ -11,7 +11,9 @@ static guint timer_id = 0;
 // 回调函数：创建房间
 static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在创建房间...\n");
-    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    // sleep(2);//后面替换为等待连接阻塞
+    //gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
 }
 
 // 回调函数：加入房间
@@ -166,7 +168,7 @@ static gboolean tack_callback(gpointer data) {
     tickTask();
     //更新时间
     gametime++;
-    int time_seconds = gametime/20;
+    int time_seconds = gametime / 20;
     int minutes = time_seconds / 60;
     int seconds = time_seconds % 60;
     gchar *time_str = g_strdup_printf("时间: %02d:%02d", minutes, seconds);
@@ -189,8 +191,9 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
             init_game_grid();
             isrun=true;
         }
+        gametime = 0;
         if (timer_id == 0) {
-            timer_id = g_timeout_add(50, tack_callback, NULL);
+            timer_id = g_timeout_add(100, tack_callback, NULL);
         }
     }
 }
