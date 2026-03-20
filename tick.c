@@ -1,8 +1,8 @@
 /*
  * @Date: 2026-03-19 10:49:37
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-19 20:16:51
- * @FilePath: /loudou/file/2JIEDUAN/tick.c
+ * @LastEditTime: 2026-03-20 09:26:16
+ * @FilePath: /2JIEDUAN/tick.c
  */
 #include "head.h"
 #include <sys/time.h>
@@ -68,6 +68,10 @@ void tickTask()
         {
             rival_score = himinfo.sc;
         }
+    }
+    if(maps[himinfo.x][himinfo.y] == 1){
+        maps[himinfo.x][himinfo.y] = 0;
+        himinfo.sc++;
     }
     if(isrun)
     {

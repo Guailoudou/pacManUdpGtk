@@ -1,8 +1,8 @@
 /*
  * @Date: 2026-03-19 14:37:29
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-19 19:04:05
- * @FilePath: /loudou/file/2JIEDUAN/player.c
+ * @LastEditTime: 2026-03-20 09:26:39
+ * @FilePath: /2JIEDUAN/player.c
  */
 /*
  * @Date: 2026-03-19 14:37:29
@@ -22,10 +22,6 @@ void up() //上
 {
     if(ishuman){
         if(maps[himinfo.x][himinfo.y-1] != -1){
-            if(maps[himinfo.x][himinfo.y-1] == 1){
-                maps[himinfo.x][himinfo.y-1] = 0;
-                himinfo.sc++;
-            }
             himinfo.y--;
         }
     }else{
@@ -38,10 +34,6 @@ void down() //下
 {
     if(ishuman){
         if(maps[himinfo.x][himinfo.y+1] != -1){
-            if(maps[himinfo.x][himinfo.y+1] == 1){
-                maps[himinfo.x][himinfo.y+1] = 0;
-                himinfo.sc++;
-            }
             himinfo.y++;
         }
     }else{
@@ -55,10 +47,6 @@ void left() //左
 {
     if(ishuman){
         if(maps[himinfo.x-1][himinfo.y] != -1){
-            if(maps[himinfo.x-1][himinfo.y] == 1){
-                maps[himinfo.x-1][himinfo.y] = 0;
-                himinfo.sc++;
-            }
             himinfo.x--;
         }
     }else{
@@ -72,10 +60,6 @@ void right() //右边
 {
     if(ishuman){
         if(maps[himinfo.x+1][himinfo.y] != -1){
-            if(maps[himinfo.x+1][himinfo.y] == 1){
-                maps[himinfo.x+1][himinfo.y] = 0;
-                himinfo.sc++;
-            }
             himinfo.x++;
         }
     }else{

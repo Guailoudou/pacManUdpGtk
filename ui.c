@@ -6,8 +6,6 @@ static GtkWidget *game_grid = NULL;
 static GtkWidget *label_score = NULL;
 static GtkWidget *label_time = NULL;
 static GtkCssProvider *css_provider = NULL; // 用于管理动态样式
-static int current_score = 0;
-static int time_seconds = 0;
 static guint timer_id = 0;
 
 // 回调函数：创建房间
@@ -144,29 +142,41 @@ static void init_game_grid() {
     g_print("格子生成完毕。\n");
 }
 
-// 定时器回调
-static gboolean update_game_info(gpointer data) {
-    time_seconds++;
-    current_score += 1; 
+// // 定时器回调
+// static gboolean update_game_info(gpointer data) {
+//     time_seconds++;
+//     current_score += 1; 
 
-    int minutes = time_seconds / 60;
-    int seconds = time_seconds % 60;
+//     int minutes = time_seconds / 60;
+//     int seconds = time_seconds % 60;
 
-    gchar *time_str = g_strdup_printf("时间: %02d:%02d", minutes, seconds);
-    gchar *score_str = g_strdup_printf("分数: %d", current_score);
+//     gchar *time_str = g_strdup_printf("时间: %02d:%02d", minutes, seconds);
+//     gchar *score_str = g_strdup_printf("分数: %d", current_score);
 
-    gtk_label_set_text(GTK_LABEL(label_time), time_str);
-    gtk_label_set_text(GTK_LABEL(label_score), score_str);
+//     gtk_label_set_text(GTK_LABEL(label_time), time_str);
+//     gtk_label_set_text(GTK_LABEL(label_score), score_str);
 
-    g_free(time_str);
-    g_free(score_str);
+//     g_free(time_str);
+//     g_free(score_str);
     
-    return G_SOURCE_CONTINUE;
-}
+//     return G_SOURCE_CONTINUE;
+// }
 // 回调函数
 static gboolean tack_callback(gpointer data) {
     tickTask();
-    
+    //更新时间
+    gametime++;
+    int time_seconds = gametime/20;
+    int minutes = time_seconds / 60;
+    int seconds = time_seconds % 60;
+    gchar *time_str = g_strdup_printf("时间: %02d:%02d", minutes, seconds);
+    gtk_label_set_text(GTK_LABEL(label_time), time_str);
+    g_free(time_str);
+    //更新分数
+    gchar *score_str = g_strdup_printf("分数: %d", himinfo.sc);
+    gtk_label_set_text(GTK_LABEL(label_score), score_str);
+    g_free(score_str);
+
     // 返回 TRUE 表示继续调用，返回 FALSE 表示停止并销毁定时器
     return G_SOURCE_CONTINUE; 
     // 或者直接写 return TRUE;
@@ -180,9 +190,8 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
             isrun=true;
         }
         if (timer_id == 0) {
-            timer_id = g_timeout_add_seconds(1, update_game_info, NULL);
+            timer_id = g_timeout_add(50, tack_callback, NULL);
         }
-        guint tick_timer_id = g_timeout_add(50, tack_callback, NULL);
     }
 }
 
