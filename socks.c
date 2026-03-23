@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-12 10:05:56
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 09:38:52
+ * @LastEditTime: 2026-03-23 13:05:58
  * @FilePath: /2JIEDUAN/socks.c
  */
 #include "head.h"
@@ -88,7 +88,11 @@ void *getinfo(void *arg)
         int tempx,tempy,tempc,tempgametime;
         // recv(buf, sizeof(buf));
         socklen_t addr_len = sizeof(addr);
-        int recv_num = recvfrom(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addr_len);
+        int recv_num = recvfrom(udp_sock, buf, sizeof(buf), MSG_DONTWAIT, (struct sockaddr *)&addr, &addr_len);
+        if(recv_num<0 && errno == EWOULDBLOCK){
+            usleep(100);
+            continue;
+        }
         if(ishuman){
             sscanf(buf,"%d_%d_%d_%d_%d_%d",&tempx,&tempy,
             &ghostinfo.x,&ghostinfo.y,&tempc,&tempgametime);
@@ -107,16 +111,30 @@ void *sendmap(void *arg)
 {
     char buf[10];
     socklen_t addr_len = sizeof(addr);
+    char temp[1024];
+    while (recvfrom(udp_sock, temp, sizeof(temp), MSG_DONTWAIT, NULL, NULL) > 0) {
+        // 清空缓冲区，不做处理
+        printf("%s ",temp);
+    }
     while (strcmp("hi",buf)!=0) //等待收到hi然后发送地图
     {
+        usleep(500);
         int recv_num = recvfrom(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addr_len);
+
     }
-    
-    ssize_t sent_bytes = sendto(udp_sock, (const char *)maps, 
+
+    memset(buf, 0, sizeof(buf));
+    ssize_t sent_bytes;
+    // while (strcmp("ok",buf)!=0)
+    // {
+    //     usleep(500);
+        sent_bytes = sendto(udp_sock, (const char *)maps, 
                                 sizeof(maps), 
                                 0, (struct sockaddr *)&addr, 
                                 sizeof(addr));
-
+    //     recvfrom(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addr_len);
+    // }
+    
     if (sent_bytes == -1) {
         perror("Send failed");
     } else {
@@ -129,24 +147,32 @@ void *sendmap(void *arg)
         }else{
             ghostinfo.x=MAPSIZE/2;
             ghostinfo.y=MAPSIZE/2;
-            sleep(5);
         }
-        gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+        printf("开始切换到游戏页\n");
+        // gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
         isrun=true;
-        runTick();
+        // runTick();
         runNetTask();
     }
 }
 void *recvmap(void *arg)
 {
     socklen_t addr_len = sizeof(addr);
-
-    char buf[10]="hi";
+    char temp[1024];
+    while (recvfrom(udp_sock, temp, sizeof(temp), MSG_DONTWAIT, NULL, NULL) > 0) {
+        // 清空缓冲区，不做处理
+    }
+    char buf[10]="hi",buf2[10];
+    // while (strcmp("hi",buf2)!=0)
+    // {
     sendto(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, addr_len);
-
-
+    // recvfrom(udp_sock, (char *)buf2, sizeof(buf2), 
+    //                         MSG_DONTWAIT, (struct sockaddr *)&addr, &addr_len);
+    // }
+    // char buf3[10]="ok";
     ssize_t recv_len = recvfrom(udp_sock, (char *)maps, sizeof(maps), 
                                 0, (struct sockaddr *)&addr, &addr_len);
+    // sendto(udp_sock, buf3, sizeof(buf3), 0, (struct sockaddr *)&addr, addr_len);
     if (recv_len < 0) {
         perror("Recv failed");
     } else {
@@ -159,13 +185,18 @@ void *recvmap(void *arg)
         }else{
             ghostinfo.x=MAPSIZE/2;
             ghostinfo.y=MAPSIZE/2;
-            sleep(5);
         }
-        gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+        printf("开始切换到游戏页\n");
+        
         isrun=true;
-        runTick();
+        // runTick();
         runNetTask();
     }
+}
+
+void close_sock()
+{
+    close(udp_sock);
 }
     // char buf[256];
     // socklen_t addr_len = sizeof(buf);

@@ -175,6 +175,17 @@
                 </attributes>
               </object>
             </child>
+            <child>
+              <object class="GtkLabel" id="label_waiting_info">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">鬼要5s后才能移动...</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="scale" value="1.2"/>
+                </attributes>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="name">page_waiting</property>
@@ -343,6 +354,44 @@
           <packing>
             <property name="name">page_game</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <!-- 结算界面 -->
+        <child>
+         
+          <object class="GtkBox" id="checkout_bok">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="spacing">10</property>
+            <!-- 结算 -->
+            <child>
+              <object class="GtkLabel" id="label_checkout">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">你的分数...</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="scale" value="1.2"/>
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label_checkout_info">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">你赢了...</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="scale" value="1.2"/>
+                </attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="name">page_checkout</property>
           </packing>
         </child>
         

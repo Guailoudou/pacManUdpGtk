@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-19 14:37:29
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-20 09:26:39
+ * @LastEditTime: 2026-03-23 12:35:43
  * @FilePath: /2JIEDUAN/player.c
  */
 /*
@@ -25,6 +25,7 @@ void up() //上
             himinfo.y--;
         }
     }else{
+        if(gametime<20*5)return;
         if(maps[ghostinfo.x][ghostinfo.y-1] != -1){
             ghostinfo.y--;
         }
@@ -37,6 +38,7 @@ void down() //下
             himinfo.y++;
         }
     }else{
+        if(gametime<20*5)return;
         if(maps[ghostinfo.x][ghostinfo.y+1] != -1){
             ghostinfo.y++;
         }
@@ -50,6 +52,7 @@ void left() //左
             himinfo.x--;
         }
     }else{
+        if(gametime<20*5)return;
         if(maps[ghostinfo.x-1][ghostinfo.y] != -1){
             ghostinfo.x--;
         }
@@ -63,7 +66,8 @@ void right() //右边
             himinfo.x++;
         }
     }else{
-        if(maps[ghostinfo.x][ghostinfo.y] != -1){
+        if(gametime<20*5)return;
+        if(maps[ghostinfo.x+1][ghostinfo.y] != -1){
             ghostinfo.x++;
         }
     }

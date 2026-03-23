@@ -16,6 +16,8 @@ static GtkWidget *left_button = NULL;
 static GtkWidget *right_button = NULL;
 static GtkWidget *window = NULL;
 static GtkCssProvider *css_provider = NULL; // 用于管理动态样式
+static GtkWidget *checkout_info_label = NULL;
+static GtkWidget *checkout_label = NULL;
 static guint timer_id = 0;
 
 static guint move_timer_id = 0;
@@ -185,7 +187,7 @@ gboolean move_timeout_callback(gpointer data) {
     return G_SOURCE_CONTINUE; // 继续运行定时器
 }
 gboolean on_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
-    // 检查是否按下了 F5
+
     if (move_timer_id != 0) return TRUE;
 
     if (event->keyval == GDK_KEY_w || event->keyval == GDK_KEY_W) {
@@ -256,9 +258,9 @@ gboolean on_key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 // }
 // 回调函数
 static gboolean tack_callback(gpointer data) {
-    tickTask();
     //更新时间
-    gametime++;
+    if(!isrun)return FALSE;
+    tickTask();
     int time_seconds = gametime / 20;
     int minutes = time_seconds / 60;
     int seconds = time_seconds % 60;
@@ -274,26 +276,49 @@ static gboolean tack_callback(gpointer data) {
     return G_SOURCE_CONTINUE; 
     // 或者直接写 return TRUE;
 }
+static gboolean began_callback(gpointer data) {
+    //更新时间
+    if(isrun)
+    {
+        gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
+        return FALSE; 
+    }
+    
+
+    // 返回 TRUE 表示继续调用，返回 FALSE 表示停止并销毁定时器
+    return TRUE; 
+    // 或者直接写 return TRUE;
+}
 // 页面切换监听
 static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gpointer user_data) {
     const gchar *name = gtk_stack_get_visible_child_name(stack);
     if (g_strcmp0(name, "page_waiting") == 0){
         //sock
         runsendmap();
-
+        g_timeout_add(50, began_callback, NULL);
     }
     if (g_strcmp0(name, "page_game") == 0) {
-        if (gtk_container_get_children(GTK_CONTAINER(game_grid)) == NULL) {
-            init_game_grid();
-        }
+        // if (gtk_container_get_children(GTK_CONTAINER(game_grid)) == NULL) {
+        init_game_grid();
+        // }
         gametime = 0;
         if (timer_id == 0) {
-            timer_id = g_timeout_add(100, tack_callback, NULL);
+            timer_id = g_timeout_add(50, tack_callback, NULL);
         }
         g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
         g_signal_connect(window, "key-release-event", G_CALLBACK(on_key_release), NULL);
         // 确保窗口能接收按键事件
         gtk_widget_grab_focus(window); 
+    }
+    if(g_strcmp0(name,"page_checkout")==0)
+    {
+        gchar *checkout_str = g_strdup_printf("你的分数: %02d 对方的分数：%02d", score, rival_score);
+        gtk_label_set_text(GTK_LABEL(checkout_label), checkout_str);
+        g_free(checkout_str);
+
+        gchar *checkout_info_str = g_strdup_printf("你%s了!!", score>rival_score?"赢":"输");
+        gtk_label_set_text(GTK_LABEL(checkout_info_label), checkout_info_str);
+        g_free(checkout_info_str);
     }
 }
 
@@ -325,6 +350,8 @@ int cdrui_init(int argc, char *argv[]) {
     left_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_left"));
     right_button = GTK_WIDGET(gtk_builder_get_object(builder, "btn_right"));
 
+    checkout_label = GTK_WIDGET(gtk_builder_get_object(builder, "label_checkout"));
+    checkout_info_label = GTK_WIDGET(gtk_builder_get_object(builder, "label_checkout_info"));
 
     GtkWidget *btn_create = GTK_WIDGET(gtk_builder_get_object(builder, "btn_create_room"));
     GtkWidget *btn_join = GTK_WIDGET(gtk_builder_get_object(builder, "btn_join_room"));

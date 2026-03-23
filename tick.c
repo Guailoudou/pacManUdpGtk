@@ -1,13 +1,13 @@
 /*
  * @Date: 2026-03-19 10:49:37
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 09:36:32
+ * @LastEditTime: 2026-03-23 13:06:42
  * @FilePath: /2JIEDUAN/tick.c
  */
 #include "head.h"
 #include <sys/time.h>
 pthread_t tickpid=0;
-void *tick(void *arg) //废弃
+void *tick(void *arg) //弃用
 {
     struct timeval start, end;
     long seconds, microseconds;
@@ -63,9 +63,13 @@ void updata_map(int x, int y){
 }
 void tickTask()
 {
-    if(himinfo.x == ghostinfo.x && himinfo.y == ghostinfo.y)
+    if(himinfo.x == ghostinfo.x && himinfo.y == ghostinfo.y &&
+        !(himinfo.x==MAPSIZE/2 && himinfo.y==MAPSIZE/2))
     {
+
         isrun = false;
+        himinfo.x = 0;
+        ghostinfo.x = 1;
         if(ishuman)
         {
             score = himinfo.sc;
@@ -77,6 +81,15 @@ void tickTask()
         if(score == 0 || rival_score==0){
             printf("反转！\n");
             //////
+            ishuman = ishuman?false:true;
+
+            gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+        }
+        else
+        {
+            printf("游戏结束！\n我的分数：%d ，对方分数：%d",score,rival_score);
+            gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_checkout");
+            close_sock();
         }
     }
     if(maps[himinfo.x][himinfo.y] == 1){
@@ -90,7 +103,7 @@ void tickTask()
         getview();
         updata_map(himinfo.x,himinfo.y);    //更新人类玩家周围
         updata_map(ghostinfo.x,ghostinfo.y);    //更新鬼周围
-        // update_cell_color(himinfo.x,himinfo.y)
+        // update_cell_color(himinfo.x,himinfo.y)  
     }
 }
 
@@ -109,7 +122,7 @@ void runsendmap()
         pthread_create(&recmappid, NULL, recvmap, NULL);
     }
 }
-void runTick()
-{
-    pthread_create(&tickpid, NULL, tick, NULL);
-}
+// void runTick()
+// {
+//     pthread_create(&tickpid, NULL, tick, NULL);
+// }

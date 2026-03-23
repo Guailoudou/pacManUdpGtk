@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-18 10:35:02
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 09:37:00
+ * @LastEditTime: 2026-03-23 13:07:15
  * @FilePath: /2JIEDUAN/head.h
  */
 /*
@@ -85,7 +85,7 @@ extern playerinfo ghostinfo;
 extern int maps[MAPSIZE][MAPSIZE];
 extern int view[MAPSIZE][MAPSIZE];
 extern void createMaze();
-extern void tick();
+extern void *tick(void *arg);
 extern void tickTask();
 extern int getview();
 extern int createMap();
@@ -107,8 +107,9 @@ extern void *recvmap(void *arg);
 
 extern void runNetTask();   //创建收发tick线程
 extern void runsendmap();   //创建发送地图线程
-extern void runTick();  //开始执行tick更新
+// extern void runTick();  //开始执行tick更新
 
+extern void close_sock();
 
 extern pthread_t sendpid,recpid;
 extern pthread_t sendmappid,recmappid;
