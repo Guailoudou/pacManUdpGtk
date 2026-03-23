@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-18 10:35:02
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-20 12:36:27
+ * @LastEditTime: 2026-03-23 09:37:00
  * @FilePath: /2JIEDUAN/head.h
  */
 /*
@@ -98,9 +98,25 @@ extern void right(); //右边
 
 extern void update_cell_color(int x, int y, guint color_hex);
 
+extern void getsock();
+extern int setaddr(int port, char *ip);
+extern void *sendinfo(void *arg);
+extern void *getinfo(void *arg);
+extern void *sendmap(void *arg);
+extern void *recvmap(void *arg);
 
+extern void runNetTask();   //创建收发tick线程
+extern void runsendmap();   //创建发送地图线程
+extern void runTick();  //开始执行tick更新
+
+
+extern pthread_t sendpid,recpid;
+extern pthread_t sendmappid,recmappid;
+extern pthread_t tickpid;
 #define WALL_BLOCK 0x323233
 #define AIR_BLOCK 0xD4D4D4
 #define COIN_BLOCK 0xFBDF9B
 #define HIM_BLOCK 0x2CDB1D
 #define GHOST_BLOCK 0xEF2E26
+#define RENDERING_RANGE 2   //渲染范围
+extern GtkWidget *stack;

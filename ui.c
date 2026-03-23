@@ -1,7 +1,7 @@
 #include "head.h"
 #define CELL_SIZE 10
 // 全局变量
-static GtkWidget *stack = NULL;
+GtkWidget *stack = NULL;
 static GtkWidget *game_grid = NULL;
 static GtkWidget *label_score = NULL;
 static GtkWidget *label_time = NULL;
@@ -20,13 +20,18 @@ static guint timer_id = 0;
 
 static guint move_timer_id = 0;
 static gchar current_direction = 0;
+
 // 回调函数：创建房间
 static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在创建房间...\n");
     isServer = true;
-    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    ishuman=true;
     gint port_value_int = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin_button));
     g_print("端口号: %d\n", port_value_int);
+    getsock();
+    setaddr(port_value_int,"");
+
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
     // sleep(2);//后面替换为等待连接阻塞
     //gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
 }
@@ -34,11 +39,19 @@ static void on_create_room_clicked(GtkButton *button, gpointer user_data) {
 // 回调函数：加入房间
 static void on_join_room_clicked(GtkButton *button, gpointer user_data) {
     g_print("正在加入房间...\n");
-    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    
     isServer = false;
+    ishuman = false;
     gint port_value_int = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(entry_join_port));
     const gchar *ip_value = gtk_entry_get_text(GTK_ENTRY(entry_join_ip));
     g_print("连接目标: %s:%d\n", ip_value,port_value_int);
+    char buf[10];
+    sprintf(buf,"%s",ip_value);
+    getsock();
+    setaddr(port_value_int,buf);
+    
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+
 }
 
 // 回调函数：方向控制
@@ -266,14 +279,12 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
     const gchar *name = gtk_stack_get_visible_child_name(stack);
     if (g_strcmp0(name, "page_waiting") == 0){
         //sock
+        runsendmap();
 
-
-        gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_game");
     }
     if (g_strcmp0(name, "page_game") == 0) {
         if (gtk_container_get_children(GTK_CONTAINER(game_grid)) == NULL) {
             init_game_grid();
-            isrun=true;
         }
         gametime = 0;
         if (timer_id == 0) {

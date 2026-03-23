@@ -1,13 +1,13 @@
 /*
  * @Date: 2026-03-19 10:50:41
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-19 18:25:27
- * @FilePath: /loudou/file/2JIEDUAN/map.c
+ * @LastEditTime: 2026-03-23 09:12:25
+ * @FilePath: /2JIEDUAN/map.c
  */
 #include "head.h"
-extern playerinfo himinfo;
-extern playerinfo ghostinfo;
 
+
+pthread_t sendmappid=0,recmappid=0;
 int maps[MAPSIZE][MAPSIZE]={};
 int view[MAPSIZE][MAPSIZE]={};
 int getview()
