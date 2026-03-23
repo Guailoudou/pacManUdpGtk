@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-19 10:49:37
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 13:06:42
+ * @LastEditTime: 2026-03-23 13:21:09
  * @FilePath: /2JIEDUAN/tick.c
  */
 #include "head.h"
@@ -82,7 +82,7 @@ void tickTask()
             printf("反转！\n");
             //////
             ishuman = ishuman?false:true;
-
+            if(!ishuman)usleep(50);
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
         }
         else

@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-12 10:05:56
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 13:05:58
+ * @LastEditTime: 2026-03-23 13:12:50
  * @FilePath: /2JIEDUAN/socks.c
  */
 #include "head.h"
@@ -161,6 +161,7 @@ void *recvmap(void *arg)
     char temp[1024];
     while (recvfrom(udp_sock, temp, sizeof(temp), MSG_DONTWAIT, NULL, NULL) > 0) {
         // 清空缓冲区，不做处理
+        printf("%s ",temp);
     }
     char buf[10]="hi",buf2[10];
     // while (strcmp("hi",buf2)!=0)
@@ -196,6 +197,7 @@ void *recvmap(void *arg)
 
 void close_sock()
 {
+    printf("关闭套接字\n");
     close(udp_sock);
 }
     // char buf[256];

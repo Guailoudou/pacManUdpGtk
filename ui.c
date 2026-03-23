@@ -259,7 +259,7 @@ gboolean on_key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 // 回调函数
 static gboolean tack_callback(gpointer data) {
     //更新时间
-    if(!isrun)return FALSE;
+    // if(!isrun)return FALSE;
     tickTask();
     int time_seconds = gametime / 20;
     int minutes = time_seconds / 60;
