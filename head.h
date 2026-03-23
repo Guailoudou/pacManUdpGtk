@@ -1,15 +1,3 @@
-/*
- * @Date: 2026-03-18 10:35:02
- * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 13:07:15
- * @FilePath: /2JIEDUAN/head.h
- */
-/*
- * @Date: 2026-03-16 09:55:04
- * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-19 18:30:24
- * @FilePath: /loudou/file/2JIEDUAN/head.h
- */
 #ifndef __HEAD_H
 #define __HEAD_H
 
@@ -86,7 +74,7 @@ extern int maps[MAPSIZE][MAPSIZE];
 extern int view[MAPSIZE][MAPSIZE];
 extern void createMaze();
 extern void *tick(void *arg);
-extern void tickTask();
+extern bool tickTask();
 extern int getview();
 extern int createMap();
 extern int cdrui_init(int argc, char *argv[]);

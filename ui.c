@@ -18,7 +18,7 @@ static GtkWidget *window = NULL;
 static GtkCssProvider *css_provider = NULL; // 用于管理动态样式
 static GtkWidget *checkout_info_label = NULL;
 static GtkWidget *checkout_label = NULL;
-static guint timer_id = 0;
+// static guint timer_id = 0;
 
 static guint move_timer_id = 0;
 static gchar current_direction = 0;
@@ -47,7 +47,7 @@ static void on_join_room_clicked(GtkButton *button, gpointer user_data) {
     gint port_value_int = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(entry_join_port));
     const gchar *ip_value = gtk_entry_get_text(GTK_ENTRY(entry_join_ip));
     g_print("连接目标: %s:%d\n", ip_value,port_value_int);
-    char buf[10];
+    char buf[64];
     sprintf(buf,"%s",ip_value);
     getsock();
     setaddr(port_value_int,buf);
@@ -260,7 +260,7 @@ gboolean on_key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 static gboolean tack_callback(gpointer data) {
     //更新时间
     // if(!isrun)return FALSE;
-    tickTask();
+    
     int time_seconds = gametime / 20;
     int minutes = time_seconds / 60;
     int seconds = time_seconds % 60;
@@ -273,7 +273,7 @@ static gboolean tack_callback(gpointer data) {
     g_free(score_str);
 
     // 返回 TRUE 表示继续调用，返回 FALSE 表示停止并销毁定时器
-    return G_SOURCE_CONTINUE; 
+    return tickTask();; 
     // 或者直接写 return TRUE;
 }
 static gboolean began_callback(gpointer data) {
@@ -302,9 +302,9 @@ static void on_stack_notify_visible_child(GtkStack *stack, GParamSpec *pspec, gp
         init_game_grid();
         // }
         gametime = 0;
-        if (timer_id == 0) {
-            timer_id = g_timeout_add(50, tack_callback, NULL);
-        }
+        // if (timer_id == 0) {
+        g_timeout_add(50, tack_callback, NULL);
+        // }
         g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press_event), NULL);
         g_signal_connect(window, "key-release-event", G_CALLBACK(on_key_release), NULL);
         // 确保窗口能接收按键事件
@@ -371,7 +371,7 @@ int cdrui_init(int argc, char *argv[]) {
 
     gtk_main();
 
-    if (timer_id > 0) g_source_remove(timer_id);
+    // if (timer_id > 0) g_source_remove(timer_id);
     if (css_provider) g_object_unref(css_provider);
     g_object_unref(builder);
 

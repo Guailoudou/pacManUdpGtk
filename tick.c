@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-19 10:49:37
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 13:21:09
+ * @LastEditTime: 2026-03-23 14:28:09
  * @FilePath: /2JIEDUAN/tick.c
  */
 #include "head.h"
@@ -61,15 +61,15 @@ void updata_map(int x, int y){
     }
     
 }
-void tickTask()
+bool tickTask()
 {
     if(himinfo.x == ghostinfo.x && himinfo.y == ghostinfo.y &&
         !(himinfo.x==MAPSIZE/2 && himinfo.y==MAPSIZE/2))
     {
-
+        usleep(10); //等待1tick确保结束数据包发送出去了
         isrun = false;
-        himinfo.x = 0;
-        ghostinfo.x = 1;
+        himinfo.x = MAPSIZE/2;
+        ghostinfo.x = MAPSIZE/2;
         if(ishuman)
         {
             score = himinfo.sc;
@@ -84,12 +84,14 @@ void tickTask()
             ishuman = ishuman?false:true;
             if(!ishuman)usleep(50);
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+            return false;
         }
         else
         {
             printf("游戏结束！\n我的分数：%d ，对方分数：%d",score,rival_score);
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_checkout");
             close_sock();
+            return false;
         }
     }
     if(maps[himinfo.x][himinfo.y] == 1){
@@ -105,6 +107,7 @@ void tickTask()
         updata_map(ghostinfo.x,ghostinfo.y);    //更新鬼周围
         // update_cell_color(himinfo.x,himinfo.y)  
     }
+    return true;
 }
 
 void runNetTask()

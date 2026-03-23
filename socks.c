@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-03-12 10:05:56
  * @LastEditors: Guailoudou Guailoudou@outlook.com
- * @LastEditTime: 2026-03-23 13:12:50
+ * @LastEditTime: 2026-03-23 14:18:38
  * @FilePath: /2JIEDUAN/socks.c
  */
 #include "head.h"
@@ -120,7 +120,11 @@ void *sendmap(void *arg)
     {
         usleep(500);
         int recv_num = recvfrom(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addr_len);
-
+        if(strcmp("hi",buf)==0)
+        sendto(udp_sock, (const char *)buf, 
+                                sizeof(buf), 
+                                0, (struct sockaddr *)&addr, 
+                                sizeof(addr));
     }
 
     memset(buf, 0, sizeof(buf));
@@ -164,12 +168,12 @@ void *recvmap(void *arg)
         printf("%s ",temp);
     }
     char buf[10]="hi",buf2[10];
-    // while (strcmp("hi",buf2)!=0)
-    // {
-    sendto(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, addr_len);
-    // recvfrom(udp_sock, (char *)buf2, sizeof(buf2), 
-    //                         MSG_DONTWAIT, (struct sockaddr *)&addr, &addr_len);
-    // }
+    while (strcmp("hi",buf2)!=0)
+    {
+        sendto(udp_sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, addr_len);
+        recvfrom(udp_sock, (char *)buf2, sizeof(buf2), 
+                            MSG_DONTWAIT, (struct sockaddr *)&addr, &addr_len);
+    }
     // char buf3[10]="ok";
     ssize_t recv_len = recvfrom(udp_sock, (char *)maps, sizeof(maps), 
                                 0, (struct sockaddr *)&addr, &addr_len);
