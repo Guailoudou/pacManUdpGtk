@@ -65,7 +65,12 @@ static void on_move_clicked(GtkButton *button, gpointer user_data) {
     if(strcmp(direction,"右")==0)right();
     // g_print("移动方向: %s\n", direction);
 }
-
+static void on_back_clicked(GtkButton *button, gpointer user_data)
+{
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_lobby");
+    score = 0;
+    rival_score = 0;
+}
 /// --- 核心绘图函数 ---
 // 当 DrawingArea 需要重绘时调用
 static gboolean on_cell_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
@@ -363,6 +368,8 @@ int cdrui_init(int argc, char *argv[]) {
     g_signal_connect(gtk_builder_get_object(builder, "btn_down"), "clicked", G_CALLBACK(on_move_clicked), "下");
     g_signal_connect(gtk_builder_get_object(builder, "btn_left"), "clicked", G_CALLBACK(on_move_clicked), "左");
     g_signal_connect(gtk_builder_get_object(builder, "btn_right"), "clicked", G_CALLBACK(on_move_clicked), "右");
+
+    g_signal_connect(gtk_builder_get_object(builder, "btn_back"), "clicked", G_CALLBACK(on_back_clicked), NULL);
 
     g_signal_connect(stack, "notify::visible-child-name", G_CALLBACK(on_stack_notify_visible_child), NULL);
 
