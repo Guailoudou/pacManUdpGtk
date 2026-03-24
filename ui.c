@@ -70,6 +70,13 @@ static void on_back_clicked(GtkButton *button, gpointer user_data)
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_lobby");
     score = 0;
     rival_score = 0;
+    close_sock();
+}
+static void on_regame_clicked(GtkButton *button, gpointer user_data)
+{
+    gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_waiting");
+    score = 0;
+    rival_score = 0;
 }
 /// --- 核心绘图函数 ---
 // 当 DrawingArea 需要重绘时调用
@@ -370,6 +377,7 @@ int cdrui_init(int argc, char *argv[]) {
     g_signal_connect(gtk_builder_get_object(builder, "btn_right"), "clicked", G_CALLBACK(on_move_clicked), "右");
 
     g_signal_connect(gtk_builder_get_object(builder, "btn_back"), "clicked", G_CALLBACK(on_back_clicked), NULL);
+    g_signal_connect(gtk_builder_get_object(builder, "btn_regame"), "clicked", G_CALLBACK(on_regame_clicked), NULL);
 
     g_signal_connect(stack, "notify::visible-child-name", G_CALLBACK(on_stack_notify_visible_child), NULL);
 

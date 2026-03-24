@@ -90,7 +90,7 @@ bool tickTask()
         {
             printf("游戏结束！\n我的分数：%d ，对方分数：%d",score,rival_score);
             gtk_stack_set_visible_child_name(GTK_STACK(stack), "page_checkout");
-            close_sock();
+            
             return false;
         }
     }
